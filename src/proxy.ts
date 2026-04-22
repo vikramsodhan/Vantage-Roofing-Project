@@ -18,10 +18,13 @@ import { NextResponse, type NextRequest } from 'next/server'
  * the perfect place to silently refresh tokens before they expire,
  * keeping the user logged in without interruption.
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Start by passing the request through unchanged.
   // We'll modify this response if we need to set cookies or redirect.
   let supabaseResponse = NextResponse.next({ request })
+
+  console.log("Middleware path:", request.nextUrl.pathname)
+
 
   // Create a Supabase client that can read/write cookies on the request/response.
   // This is slightly different from the server client in server.ts because
@@ -35,12 +38,6 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          // Set cookies on both the request and the response.
-          // Request: so subsequent code in this middleware sees the updated session.
-          // Response: so the browser receives the updated session cookie.
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -69,6 +66,7 @@ export async function middleware(request: NextRequest) {
     if (!profile?.is_active) {
       // Sign them out and redirect with a reason in the URL
       // so the login page can show a helpful message
+
       await supabase.auth.signOut()
       return NextResponse.redirect(
         new URL('/login?reason=deactivated', request.url)

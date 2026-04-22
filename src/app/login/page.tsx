@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleEmailLogin(e: React.FormEvent) {
+  async function handleEmailLogin(e: React.SubmitEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
@@ -41,8 +41,6 @@ export default function LoginPage() {
     switch (reason) {
       case 'deactivated':
         return 'Your account has been deactivated. Please contact your administrator.'
-      case 'auth_error':
-        return 'There was a problem signing in. Please try again.'
       default:
         return null
     }
