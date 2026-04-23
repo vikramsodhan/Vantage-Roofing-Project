@@ -2,35 +2,48 @@
 
 import Link from "next/link"
 import type { Job } from "@/types/job"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 
 type JobTableProps = {
   jobs: Job[]
 }
 
-export default function JobTable({ jobs }: JobTableProps ) {
+export default function JobTable({ jobs }: JobTableProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {jobs.length === 0 && (
         <p className="text-gray-500 text-sm">No jobs found.</p>
       )}
 
       {jobs.map((job) => (
-        <div
-          key={job.id}
-          className="border p-3 rounded-md bg-white shadow-sm"
-        >
-          {Object.entries(job).map(([key, value]) => (
-            <p key={key} className="text-sm">
-              <span className="font-medium">{key}:</span> {String(value)}
-            </p>
-          ))}
-          <Link
-            href={`/jobs/${job.id}/edit`}
-            className="text-blue-600 text-sm underline mt-1 inline-block"
-          >
-            Edit
-          </Link>
-        </div>
+        <Card key={job.id}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {job.job_address}
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <Table>
+              <TableBody>
+                {Object.entries(job).map(([key, value]) => (
+                  <TableRow key={key}>
+                    <TableCell className="font-medium">{key}</TableCell>
+                    <TableCell>{String(value)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <div className="mt-4">
+              <Button asChild variant="outline">
+                <Link href={`/jobs/${job.id}/edit`}>Edit</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       ))}
     </div>
   )
