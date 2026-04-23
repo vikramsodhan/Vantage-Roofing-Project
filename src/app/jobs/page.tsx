@@ -10,6 +10,7 @@ export default async function JobsPage() {
   const { data: jobs, error } = await supabase
     .from("jobs")
     .select("*")
+    .order("date_entered", { ascending: false })
 
   return (
     <div className="p-6 md:p-8">

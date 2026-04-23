@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import type { Job } from "@/types/job"
+import type { Job } from "@/types"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
