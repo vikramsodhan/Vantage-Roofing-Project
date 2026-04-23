@@ -23,9 +23,6 @@ export async function proxy(request: NextRequest) {
   // We'll modify this response if we need to set cookies or redirect.
   let supabaseResponse = NextResponse.next({ request })
 
-  console.log("Middleware path:", request.nextUrl.pathname)
-
-
   // Create a Supabase client that can read/write cookies on the request/response.
   // This is slightly different from the server client in server.ts because
   // middleware has its own cookie API separate from next/headers.
