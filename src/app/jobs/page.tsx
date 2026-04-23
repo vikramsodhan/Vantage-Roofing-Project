@@ -1,11 +1,33 @@
-export default function JobsPage() {
+import { createClient } from "@/lib/supabase/server"
+import JobTable from "./_components/JobTable"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
+
+export default async function JobsPage() {
+  const supabase = await createClient()
+
+  const { data: jobs, error } = await supabase
+    .from("jobs")
+    .select("*")
 
   return (
     <div className="p-6 md:p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">List of Jobs</h1>
-      <p className="text-gray-500 text-sm">
-        Job table here, and buttons to add/edit/delete jobs coming soon.
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold text-gray-900">List of Jobs</h1>
+
+        <Button asChild>
+          <Link href="/jobs/new">New Job</Link>
+        </Button>
+      </div>
+
+      {error && (
+        <p className="text-red-500 text-sm mb-4">
+          Failed to load jobs: {error.message}
+        </p>
+      )}
+
+      <JobTable jobs={jobs || []} />
     </div>
   )
 }
