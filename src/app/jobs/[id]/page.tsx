@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { DeleteJobButton } from "../_components/DeleteJobButton"
 
 export default async function JobDetailPage( {params}: { params: Promise<{ id: string }> }) {
 
@@ -23,6 +24,7 @@ export default async function JobDetailPage( {params}: { params: Promise<{ id: s
       <p className="text-gray-500 text-sm">
         Here&apos;s where we&apos;ll view existing job details. {job_id}
       </p>
+      <DeleteJobButton jobId={job_id} /> 
       <Button asChild>
         <Link href={`/jobs/${job_id}/edit`}>Edit</Link>
       </Button>

@@ -5,6 +5,7 @@ import type { Job } from "@/types"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { DeleteJobButton } from "./DeleteJobButton"
 
 type JobTableProps = {
   jobs: Job[]
@@ -22,9 +23,9 @@ export default function JobTable({ jobs }: JobTableProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {job.job_address}
+              <DeleteJobButton jobId={job.id} /> 
             </CardTitle>
           </CardHeader>
-
           <CardContent>
             <Table>
               <TableBody>

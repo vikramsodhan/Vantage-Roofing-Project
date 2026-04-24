@@ -23,6 +23,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import type { JobInsert, JobUpdate } from "@/types"
+import { revalidatePath } from "next/cache";
 
 type ActionResult =
   | { success: true; id: string }
@@ -100,4 +101,41 @@ export async function updateJob(payloadData: JobUpdate, id: string): Promise<Act
   }
 
   return { success: true, id }
+}
+
+
+export async function deleteJob(jobId: string): Promise<ActionResult> {
+  // 1. Get the authenticated user — never trust data from the client
+  //    to know who is submitting. Always read it from the server session.
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { success: false, error: "You must be logged in to create a job." }
+  }
+
+  // 2. Confirm the user is still active
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_active")
+    .eq("id", user.id)
+    .single()
+
+  if (!profile?.is_active) {
+    return { success: false, error: "Your account is inactive." }
+  }
+
+  // 3. Delete — always stamp entered_by with the real server-side user ID.
+  //    Even if the client sends a different entered_by value, we overwrite it
+  //    here so it can't be spoofed.
+  const { error } = await supabase
+    .from("jobs")
+    .delete()
+    .eq("id", jobId)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+  revalidatePath("/jobs") // Revalidate the jobs list page so the deleted job disappears from the list
+  return { success: true, id: jobId }
 }
