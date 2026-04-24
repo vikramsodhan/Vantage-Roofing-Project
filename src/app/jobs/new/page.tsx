@@ -20,7 +20,6 @@ export default async function NewJobPage() {
     <div className="p-6 md:p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">New Job</h1>
       <JobForm
-        mode="create"
         divisions={divisions ?? []}
         workTypes={workTypes ?? []}
         salespersons={salespersons ?? []}

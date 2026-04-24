@@ -13,7 +13,6 @@
  * Validation errors are browser alerts for now.
  *
  * Props:
- * - mode: "create" | "edit" — edit will pre-fill defaultValues (not wired yet)
  * - divisions, workTypes, salespersons — fetched server-side and passed in
  * - defaultValues — optional, used by edit page to pre-fill (wired up later)
  *
@@ -65,7 +64,6 @@ function toMonthDate(month: number | null, year: number | null): string | null {
 }
 
 interface JobFormProps {
-  mode: "create" | "edit"
   divisions: Pick<Division, "id" | "name">[]
   workTypes: Pick<WorkType, "id" | "name">[]
   salespersons: Pick<Profile, "id" | "full_name">[]
@@ -74,7 +72,6 @@ interface JobFormProps {
 }
 
 export default function JobForm({
-  mode,
   divisions,
   workTypes,
   salespersons,
