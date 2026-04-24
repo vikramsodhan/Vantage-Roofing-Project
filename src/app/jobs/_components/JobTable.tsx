@@ -39,6 +39,9 @@ export default function JobTable({ jobs }: JobTableProps) {
 
             <div className="mt-4">
               <Button asChild variant="outline">
+                <Link href={`/jobs/${job.id}`}>View</Link>
+              </Button>
+              <Button asChild variant="outline">
                 <Link href={`/jobs/${job.id}/edit`}>Edit</Link>
               </Button>
             </div>
