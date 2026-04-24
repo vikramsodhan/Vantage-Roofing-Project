@@ -7,3 +7,4 @@ export type Division = Database["public"]["Tables"]["divisions"]["Row"]
 export type WorkType = Database["public"]["Tables"]["work_types"]["Row"]
 
 export type JobInsert = Database["public"]["Tables"]["jobs"]["Insert"]
+export type JobUpdate = Database["public"]["Tables"]["jobs"]["Update"]

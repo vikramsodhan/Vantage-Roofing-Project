@@ -1,11 +1,37 @@
-export default function EditJobPage() {
+import { createClient } from "@/lib/supabase/server"
+import { notFound } from "next/navigation"
+import JobForm from "../../_components/JobForm"
+
+export default async function EditJobPage( {params}: { params: Promise<{ id: string }> }) {
+  const supabase = await createClient()
+
+  const { id: job_id } = await params
+
+  // Fetch all dropdown data in parallel.
+  // These three queries run at the same time instead of one after another.
+  const [
+    { data: jobData },
+    { data: divisions },
+    { data: workTypes },
+    { data: salespersons },
+  ] = await Promise.all([
+    supabase.from("jobs").select("*").eq("id", job_id).single(),
+    supabase.from("divisions").select("id, name").order("name"),
+    supabase.from("work_types").select("id, name").order("name"),
+    supabase.from("profiles").select("id, full_name").eq("is_active", true).order("full_name"),
+  ])
+
+  if (!jobData) notFound()
 
   return (
     <div className="p-6 md:p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Edit job page/form</h1>
-      <p className="text-gray-500 text-sm">
-        Here&apos;s where we&apos;ll edit existing jobs. Component should have pre-filled data.
-      </p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Job</h1>
+      <JobForm
+        divisions={divisions ?? []}
+        workTypes={workTypes ?? []}
+        salespersons={salespersons ?? []}
+        defaultValues={jobData}
+      />
     </div>
   )
 }

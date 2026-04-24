@@ -27,7 +27,7 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { createJob } from "../actions"
+import { createJob, updateJob } from "../actions"
 import type { Division, WorkType, Profile, Job } from "@/types"
 
 // Month options for the month picker
@@ -68,7 +68,7 @@ interface JobFormProps {
   workTypes: Pick<WorkType, "id" | "name">[]
   salespersons: Pick<Profile, "id" | "full_name">[]
   // defaultValues wired up later when we build the edit page
-  defaultValues?: Partial<Job>
+  defaultValues?: Job
 }
 
 export default function JobForm({
@@ -117,8 +117,36 @@ export default function JobForm({
     return null
   }
 
+  function buildJobPayload(){
+    const toNumberOrNull = (value: string) =>
+    value !== "" ? parseFloat(value) : null
+
+  const toNumberOrZero = (value: string) =>
+    value !== "" ? parseFloat(value) : 0
+
+  return {
+    job_address: jobAddress.trim(),
+    division: division || null,
+    type_of_work: typeOfWork || null,
+    salesperson_id: salespersonId || null,
+    sold,
+    month_quoted: toMonthDate(mqMonth, mqYear),
+    month_sold: toMonthDate(msMonth, msYear),
+
+    squares: toNumberOrNull(squares),
+    days: toNumberOrNull(days),
+    sales_price: toNumberOrNull(salesPrice),
+
+    materials: toNumberOrZero(materials),
+    labour: toNumberOrZero(labour),
+    disposal: toNumberOrZero(disposal),
+    warranty: toNumberOrZero(warranty),
+    other: toNumberOrZero(other),
+    gutters: toNumberOrZero(gutters),
+  }}
+
   // ── Submit ───────────────────────────────────────────────────────────────
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault()
 
     const validationError = validate()
@@ -127,35 +155,22 @@ export default function JobForm({
       return
     }
 
+    const payload = buildJobPayload()
+
     startTransition(async () => {
-      const result = await createJob({
-        job_address: jobAddress.trim(),
-        division: division || null,
-        type_of_work: typeOfWork || null,
-        salesperson_id: salespersonId || null,
-        sold,
-        month_quoted: toMonthDate(mqMonth, mqYear),
-        month_sold: toMonthDate(msMonth, msYear),
-        // Parse string inputs back to numbers, null if empty
-        squares: squares !== "" ? parseFloat(squares) : null,
-        days: days !== "" ? parseFloat(days) : null,
-        materials: materials !== "" ? parseFloat(materials) : 0,
-        labour: labour !== "" ? parseFloat(labour) : 0,
-        disposal: disposal !== "" ? parseFloat(disposal) : 0,
-        warranty: warranty !== "" ? parseFloat(warranty) : 0,
-        other: other !== "" ? parseFloat(other) : 0,
-        gutters: gutters !== "" ? parseFloat(gutters) : 0,
-        sales_price: salesPrice !== "" ? parseFloat(salesPrice) : null,
-      })
+
+      const isEdit = Boolean(defaultValues?.id)
+
+      const result = isEdit
+        ? await updateJob(payload, defaultValues!.id)
+        : await createJob(payload)
 
       if (!result.success) {
         alert(result.error)
         return
       }
 
-      // Redirect to /jobs — revalidatePath in the action ensures the
-      // newest job appears at the top of the sorted list
-      router.push("/jobs")
+      router.push(`/jobs/${result.id}`)
     })
   }
 
