@@ -49,6 +49,15 @@ export async function proxy(request: NextRequest) {
   // cookie without verifying it's still valid on the server.
   const { data: { user } } = await supabase.auth.getUser()
 
+  const isPublicRoute =
+  request.nextUrl.pathname.startsWith('/login') ||
+  request.nextUrl.pathname.startsWith('/auth')
+
+  // Redirect authenticated users away from login/auth pages
+  if (user && isPublicRoute) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
   // If a user is logged in, check if they are still active.
   // This is what enforces the is_active flag — the moment an owner
   // deactivates someone, their next request hits this check and
@@ -75,11 +84,7 @@ export async function proxy(request: NextRequest) {
   // We exclude /login and /auth paths so they don't get caught in
   // a redirect loop (middleware would redirect → /login → middleware
   // → /login forever without this check).
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
+  if (!user && !isPublicRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
