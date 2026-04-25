@@ -12,7 +12,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog"
-import { deleteJob } from "@/app/jobs/actions"
+import { deleteJob } from "@/app/(app)/jobs/actions"
 
 export function DeleteJobButton({ jobId }: { jobId: string }) {
   const router = useRouter()
