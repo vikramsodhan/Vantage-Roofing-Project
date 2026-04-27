@@ -22,6 +22,7 @@
  */
 
 import { createClient } from "@/lib/supabase/server"
+import { getProfile } from "@/lib/supabase/getProfile";
 import type { JobInsert, JobUpdate } from "@/types"
 import { revalidatePath } from "next/cache";
 
@@ -40,11 +41,7 @@ export async function createJob(payloadData: JobInsert): Promise<ActionResult> {
   }
 
   // 2. Confirm the user is still active
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_active")
-    .eq("id", user.id)
-    .single()
+  const profile = await getProfile()
 
   if (!profile?.is_active) {
     return { success: false, error: "Your account is inactive." }
@@ -78,11 +75,7 @@ export async function updateJob(payloadData: JobUpdate, id: string): Promise<Act
   }
 
   // 2. Confirm the user is still active
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_active")
-    .eq("id", user.id)
-    .single()
+  const profile = await getProfile()
 
   if (!profile?.is_active) {
     return { success: false, error: "Your account is inactive." }
@@ -115,11 +108,7 @@ export async function deleteJob(jobId: string): Promise<ActionResult> {
   }
 
   // 2. Confirm the user is still active
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("is_active")
-    .eq("id", user.id)
-    .single()
+  const profile = await getProfile()
 
   if (!profile?.is_active) {
     return { success: false, error: "Your account is inactive." }

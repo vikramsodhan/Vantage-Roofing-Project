@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 /**
- * middleware.ts — Route Protection & Session Management
+ * proxy.ts — Route Protection & Session Management
  *
  * This file runs on EVERY request before it reaches any page or API route.
  * Think of it as a security guard at the door — it checks credentials
@@ -14,7 +14,7 @@ import { NextResponse, type NextRequest } from 'next/server'
  *   3. Checks if the user is active — signs out deactivated users immediately
  *
  * Why handle session refresh here? Because Supabase sessions expire
- * after a period of time. Middleware runs on every request, making it
+ * after a period of time. proxy runs on every request, making it
  * the perfect place to silently refresh tokens before they expire,
  * keeping the user logged in without interruption.
  */
@@ -25,7 +25,7 @@ export async function proxy(request: NextRequest) {
 
   // Create a Supabase client that can read/write cookies on the request/response.
   // This is slightly different from the server client in server.ts because
-  // middleware has its own cookie API separate from next/headers.
+  // proxy has its own cookie API separate from next/headers.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -58,31 +58,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // If a user is logged in, check if they are still active.
-  // This is what enforces the is_active flag — the moment an owner
-  // deactivates someone, their next request hits this check and
-  // they are immediately signed out.
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_active')
-      .eq('id', user.id)
-      .single()
-
-    if (!profile?.is_active) {
-      // Sign them out and redirect with a reason in the URL
-      // so the login page can show a helpful message
-
-      await supabase.auth.signOut()
-      return NextResponse.redirect(
-        new URL('/login?reason=deactivated', request.url)
-      )
-    }
-  }
-
   // If no user is logged in, redirect to login.
   // We exclude /login and /auth paths so they don't get caught in
-  // a redirect loop (middleware would redirect → /login → middleware
+  // a redirect loop (proxy would redirect → /login → proxy
   // → /login forever without this check).
   if (!user && !isPublicRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -93,7 +71,7 @@ export async function proxy(request: NextRequest) {
 }
 
 /**
- * config.matcher — Which routes does middleware run on?
+ * config.matcher — Which routes does proxy run on?
  *
  * This regex matches everything EXCEPT:
  *   - _next/static  (Next.js bundled JS/CSS files)
@@ -102,7 +80,7 @@ export async function proxy(request: NextRequest) {
  *   - image files   (.svg, .png, .jpg, etc.)
  *
  * We exclude these because they're static assets — no auth check needed,
- * and running middleware on them would slow things down unnecessarily.
+ * and running proxy on them would slow things down unnecessarily.
  */
 export const config = {
   matcher: [

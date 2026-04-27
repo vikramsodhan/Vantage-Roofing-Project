@@ -27,6 +27,7 @@
  * doesn't match the allowed domain, regardless of how they got here.
  */
 
+import { getProfile } from "@/lib/supabase/getProfile"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse, type NextRequest } from "next/server"
 
@@ -72,11 +73,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Check if a profile already exists for this user
-  const { data: existingProfile } = await supabase
-    .from("profiles")
-    .select("id, is_active")
-    .eq("id", user.id)
-    .single()
+  const existingProfile = await getProfile()
 
   if (existingProfile) {
     // Profile exists — check if they've been deactivated

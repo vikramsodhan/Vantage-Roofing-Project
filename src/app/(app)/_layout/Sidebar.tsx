@@ -4,8 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Role } from "@/types";
 
-export default function Sidebar() {
+interface SidebarProps {
+  role: Role
+}
+
+export default function Sidebar({ role }: SidebarProps ) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -26,6 +31,11 @@ export default function Sidebar() {
         <li>
           <Link href="/jobs/new" className="text-blue-600">New Job</Link>
         </li>
+        {role === 'owner' && (
+          <li>
+            <Link href="/admin" className="text-blue-600">Admin</Link>
+          </li>
+        )}
       </ul>
 
       <Button variant="outline" onClick={handleSignOut}>
