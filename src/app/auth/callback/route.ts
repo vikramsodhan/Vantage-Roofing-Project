@@ -32,7 +32,7 @@ import { createClient } from "@/lib/supabase/server"
 import { NextResponse, type NextRequest } from "next/server"
 
 const ALLOWED_DOMAIN = "vantageroofingltd.ca"
-const DEV_EMAIL = process.env.NEXT_PUBLIC_DEV_EMAIL
+const DEV_EMAILS = process.env.NEXT_PUBLIC_DEV_EMAILS?.split(",") ?? []
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
   // DEV_EMAIL bypass lets developers test with a personal Google account
   const emailDomain = user.email.split("@")[1]
   const isAllowedDomain = emailDomain === ALLOWED_DOMAIN
-  const isDevBypass = DEV_EMAIL && user.email === DEV_EMAIL
+  const isDevBypass = DEV_EMAILS.includes(user.email)
 
   if (!isAllowedDomain && !isDevBypass) {
     // Sign them out immediately — they got through Google but not our check
