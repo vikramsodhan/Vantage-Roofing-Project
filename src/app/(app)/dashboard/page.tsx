@@ -1,4 +1,12 @@
-export default function DashboardPage() {
+import { requireActiveProfile } from "@/lib/supabase/getProfile"
+import { redirect } from "next/navigation"
+
+export default async function DashboardPage() {
+  const profile = await requireActiveProfile()
+
+  if (profile.role == 'employee') {
+      redirect('/jobs')
+  }
 
   return (
     <div className="p-6 md:p-8">
