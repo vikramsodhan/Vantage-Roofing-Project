@@ -6,9 +6,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const profile = await requireActiveProfile()
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen">
       <Sidebar role={(profile.role ?? 'employee') as Role} />
-      <main className="flex-1 p-4">
+      <main className="flex-1 p-4 overflow-y-auto">
         {children}
       </main>
     </div>

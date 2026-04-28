@@ -21,7 +21,7 @@ export default function Sidebar({ role }: SidebarProps ) {
 
   return (
     <nav className="w-48 border-r border-gray-300 p-4 flex flex-col justify-between min-h-screen">
-      <ul className="space-y-2">
+      <ul className="space-y-2 flex-1">
         <li>
           <Link href="/" className="text-blue-600">Home</Link>
         </li>
