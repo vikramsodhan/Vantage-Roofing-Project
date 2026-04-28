@@ -1,17 +1,19 @@
 "use client"
 
 import Link from "next/link"
-import type { Job } from "@/types"
+import type { Job, Profile } from "@/types"
+import { canUserModifyJob } from "@/lib/authorization/jobPermissions"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { DeleteJobButton } from "./DeleteJobButton"
 
 type JobTableProps = {
-  jobs: Job[]
+  jobs: Job[],
+  currentUserProfile: Profile
 }
 
-export default function JobTable({ jobs }: JobTableProps) {
+export default function JobTable({ jobs, currentUserProfile }: JobTableProps) {
   return (
     <div className="space-y-4">
       {jobs.length === 0 && (
@@ -23,7 +25,11 @@ export default function JobTable({ jobs }: JobTableProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {job.job_address}
-              <DeleteJobButton jobId={job.id} /> 
+              {
+                canUserModifyJob(currentUserProfile, job) && (
+                  <DeleteJobButton jobId={job.id} />
+                )
+              }
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -42,9 +48,13 @@ export default function JobTable({ jobs }: JobTableProps) {
               <Button asChild variant="outline">
                 <Link href={`/jobs/${job.id}`}>View</Link>
               </Button>
-              <Button asChild variant="outline">
-                <Link href={`/jobs/${job.id}/edit`}>Edit</Link>
-              </Button>
+              {
+                canUserModifyJob(currentUserProfile, job) && (
+                  <Button asChild variant="outline">
+                    <Link href={`/jobs/${job.id}/edit`}>Edit</Link>
+                  </Button>
+                )
+              }
             </div>
           </CardContent>
         </Card>

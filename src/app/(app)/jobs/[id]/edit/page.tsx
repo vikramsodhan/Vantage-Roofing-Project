@@ -1,8 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import JobForm from "../../_components/JobForm"
+import { requireActiveProfile } from "@/lib/supabase/getProfile"
+import { canUserModifyJob } from "@/lib/authorization/jobPermissions"
 
 export default async function EditJobPage( {params}: { params: Promise<{ id: string }> }) {
+  const profile = await requireActiveProfile()
+  
   const supabase = await createClient()
 
   const { id: job_id } = await params
@@ -22,6 +26,10 @@ export default async function EditJobPage( {params}: { params: Promise<{ id: str
   ])
 
   if (!jobData) notFound()
+  
+  if (!canUserModifyJob(profile, jobData)) {
+    redirect('/jobs') // Redirect unauthorized users back to jobs list
+  }
 
   return (
     <div className="p-6 md:p-8">

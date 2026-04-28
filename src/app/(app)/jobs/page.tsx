@@ -2,9 +2,13 @@ import { createClient } from "@/lib/supabase/server"
 import JobTable from "./_components/JobTable"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { requireActiveProfile } from "@/lib/supabase/getProfile"
 
 
 export default async function JobsPage() {
+  const profile = await requireActiveProfile()
+
+
   const supabase = await createClient()
 
   const { data: jobs, error } = await supabase
@@ -28,7 +32,7 @@ export default async function JobsPage() {
         </p>
       )}
 
-      <JobTable jobs={jobs || []} />
+      <JobTable jobs={jobs || []} currentUserProfile={profile}/>
     </div>
   )
 }
