@@ -7,3 +7,7 @@ export function canUserModifyJob(profile: Profile, job: Job) {
       profile.id === job.salesperson_id
     )  
 }
+
+export function canChangeSalesperson(profile: Profile) {
+    return( profile.role === 'owner' || profile.role === 'manager')  
+}

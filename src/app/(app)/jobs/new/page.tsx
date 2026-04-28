@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server"
 import JobForm from "../_components/JobForm"
+import { requireActiveProfile } from "@/lib/supabase/getProfile"
 
 export default async function NewJobPage() {
+  const profile = await requireActiveProfile()
+  
   const supabase = await createClient()
 
   // Fetch all dropdown data in parallel.
@@ -23,6 +26,7 @@ export default async function NewJobPage() {
         divisions={divisions ?? []}
         workTypes={workTypes ?? []}
         salespersons={salespersons ?? []}
+        currentUserProfile={profile}
       />
     </div>
   )

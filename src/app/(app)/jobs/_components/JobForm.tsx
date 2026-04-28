@@ -29,6 +29,7 @@ import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { createJob, updateJob } from "../actions"
 import type { Division, WorkType, Profile, Job } from "@/types"
+import { canChangeSalesperson } from "@/lib/authorization/jobPermissions"
 
 // Month options for the month picker
 const MONTHS = [
@@ -67,7 +68,7 @@ interface JobFormProps {
   divisions: Pick<Division, "id" | "name">[]
   workTypes: Pick<WorkType, "id" | "name">[]
   salespersons: Pick<Profile, "id" | "full_name">[]
-  // defaultValues wired up later when we build the edit page
+  currentUserProfile: Profile
   defaultValues?: Job
 }
 
@@ -75,6 +76,7 @@ export default function JobForm({
   divisions,
   workTypes,
   salespersons,
+  currentUserProfile,
   defaultValues,
 }: JobFormProps) {
   const router = useRouter()
@@ -88,7 +90,7 @@ export default function JobForm({
   const [jobAddress, setJobAddress] = useState(defaultValues?.job_address ?? "")
   const [division, setDivision] = useState(defaultValues?.division ?? "")
   const [typeOfWork, setTypeOfWork] = useState(defaultValues?.type_of_work ?? "")
-  const [salespersonId, setSalespersonId] = useState(defaultValues?.salesperson_id ?? "")
+  const [salespersonId, setSalespersonId] = useState(defaultValues?.salesperson_id ?? currentUserProfile.id)
   const [sold, setSold] = useState<boolean>(defaultValues?.sold ?? false)
 
   // Month Quoted — stored as YYYY-MM-01, displayed as two dropdowns
@@ -230,17 +232,27 @@ export default function JobForm({
       {/* Salesperson */}
       <div>
         <label className="block text-sm font-medium mb-1">Salesperson</label>
-        <select
-          value={salespersonId}
-          onChange={(e) => setSalespersonId(e.target.value)}
-          className="w-full border rounded px-3 py-2 text-sm"
-          disabled={isPending}
-        >
-          <option value="">— Select salesperson —</option>
-          {salespersons.map((s) => (
-            <option key={s.id} value={s.id}>{s.full_name ?? "Unknown"}</option>
-          ))}
-        </select>
+        {
+          canChangeSalesperson(currentUserProfile) ? (  
+            <select
+              value={salespersonId}
+              onChange={(e) => setSalespersonId(e.target.value)}
+              className="w-full border rounded px-3 py-2 text-sm"
+              disabled={isPending}
+            >
+              <option value="">— Select salesperson —</option>
+              {salespersons.map((s) => (
+                <option key={s.id} value={s.id}>{s.full_name ?? "Unknown"}</option>
+              ))}
+            </select>
+          ) : (
+            <div className="w-full border rounded px-3 py-2 text-sm bg-gray-50 text-gray-600">
+              {currentUserProfile.full_name ?? "Unknown"}
+              <input type="hidden" value={salespersonId} />
+            </div>
+          )
+        }
+          
       </div>
 
       {/* Sold */}

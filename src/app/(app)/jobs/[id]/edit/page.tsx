@@ -27,9 +27,9 @@ export default async function EditJobPage( {params}: { params: Promise<{ id: str
 
   if (!jobData) notFound()
   
-  if (!canUserModifyJob(profile, jobData)) {
-    redirect('/jobs') // Redirect unauthorized users back to jobs list
-  }
+  // if (!canUserModifyJob(profile, jobData)) {
+  //   redirect(`/jobs/${job_id}`) // Redirect unauthorized users back to jobs list
+  // }
 
   return (
     <div className="p-6 md:p-8">
@@ -38,6 +38,7 @@ export default async function EditJobPage( {params}: { params: Promise<{ id: str
         divisions={divisions ?? []}
         workTypes={workTypes ?? []}
         salespersons={salespersons ?? []}
+        currentUserProfile={profile}
         defaultValues={jobData}
       />
     </div>

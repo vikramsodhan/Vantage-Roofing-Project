@@ -30,20 +30,25 @@ type ActionResult =
   | { success: true; id: string }
   | { success: false; error: string }
 
+async function getAuthContext() {
+  const supabase = await createClient()
+  const profile = await getProfile()
+  if (!profile) return { supabase, profile: null }
+  return { supabase, profile }
+
+}
+
 export async function createJob(payloadData: JobInsert): Promise<ActionResult> {
   // 1. Get the authenticated user — never trust data from the client
   //    to know who is submitting. Always read it from the server session.
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, profile } = await getAuthContext()
 
-  if (!user) {
+  if (!profile) {
     return { success: false, error: "You must be logged in to create a job." }
   }
 
   // 2. Confirm the user is still active
-  const profile = await getProfile()
-
-  if (!profile?.is_active) {
+  if (!profile.is_active) {
     return { success: false, error: "Your account is inactive." }
   }
 
@@ -52,7 +57,7 @@ export async function createJob(payloadData: JobInsert): Promise<ActionResult> {
   //    here so it can't be spoofed.
   const {data, error} = await supabase
     .from("jobs")
-    .insert({ ...payloadData, entered_by: user.id })
+    .insert({ ...payloadData, entered_by: profile.id })
     .select("id")
     .single()
 
@@ -60,6 +65,7 @@ export async function createJob(payloadData: JobInsert): Promise<ActionResult> {
     return { success: false, error: error.message }
   }
 
+  revalidatePath("/jobs") // Revalidate the jobs list page so the deleted job disappears from the list
   return { success: true, id: data.id }
 }
 
@@ -67,17 +73,14 @@ export async function createJob(payloadData: JobInsert): Promise<ActionResult> {
 export async function updateJob(payloadData: JobUpdate, id: string): Promise<ActionResult> {
   // 1. Get the authenticated user — never trust data from the client
   //    to know who is submitting. Always read it from the server session.
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, profile } = await getAuthContext()
 
-  if (!user) {
+  if (!profile) {
     return { success: false, error: "You must be logged in to create a job." }
   }
 
   // 2. Confirm the user is still active
-  const profile = await getProfile()
-
-  if (!profile?.is_active) {
+  if (!profile.is_active) {
     return { success: false, error: "Your account is inactive." }
   }
 
@@ -86,13 +89,15 @@ export async function updateJob(payloadData: JobUpdate, id: string): Promise<Act
   //    here so it can't be spoofed.
   const { error } = await supabase
     .from("jobs")
-    .update({ ...payloadData, entered_by: user.id })
+    .update({ ...payloadData, entered_by: profile.id })
     .eq("id", id)
 
   if (error) {
     return { success: false, error: error.message }
   }
 
+  revalidatePath("/jobs") // Revalidate the jobs list page so the deleted job disappears from the list
+  revalidatePath(`/jobs/${id}`) // Revalidate the job details page so the updated job shows the new values
   return { success: true, id }
 }
 
@@ -100,17 +105,14 @@ export async function updateJob(payloadData: JobUpdate, id: string): Promise<Act
 export async function deleteJob(jobId: string): Promise<ActionResult> {
   // 1. Get the authenticated user — never trust data from the client
   //    to know who is submitting. Always read it from the server session.
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { supabase, profile } = await getAuthContext()
 
-  if (!user) {
+  if (!profile) {
     return { success: false, error: "You must be logged in to create a job." }
   }
 
   // 2. Confirm the user is still active
-  const profile = await getProfile()
-
-  if (!profile?.is_active) {
+  if (!profile.is_active) {
     return { success: false, error: "Your account is inactive." }
   }
 
