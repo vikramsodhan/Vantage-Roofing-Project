@@ -1,6 +1,7 @@
 import type { Database } from "./database.types"
 
 export type Job = Database["public"]["Tables"]["jobs"]["Row"]
+export type JobWithCalculations = Database["public"]["Views"]["jobs_with_calculations"]["Row"]
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"]
 export type Role = "owner"  | "manager" | "employee"

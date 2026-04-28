@@ -12,7 +12,7 @@ export default async function JobsPage() {
   const supabase = await createClient()
 
   const { data: jobs, error } = await supabase
-    .from("jobs")
+    .from("jobs_with_calculations")
     .select("*")
     .order("date_entered", { ascending: false })
 

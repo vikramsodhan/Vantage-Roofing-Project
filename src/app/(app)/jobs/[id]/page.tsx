@@ -14,7 +14,7 @@ export default async function JobDetailPage( {params}: { params: Promise<{ id: s
   const supabase = await createClient()
 
   const { data: job_data } = await supabase
-      .from("jobs")
+      .from("jobs_with_calculations")
       .select("*")
       .eq("id", job_id)
       .single()
@@ -31,7 +31,7 @@ export default async function JobDetailPage( {params}: { params: Promise<{ id: s
         <Link href={`/jobs`}>Back to Jobs</Link>
       </Button>
       {
-        canUserModifyJob(profile, job_data) && (
+        canUserModifyJob(profile, job_data.salesperson_id) && (
           <>
             <DeleteJobButton jobId={job_id} /> 
             <Button asChild>

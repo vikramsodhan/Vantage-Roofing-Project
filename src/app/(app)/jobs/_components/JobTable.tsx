@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import type { Job, Profile } from "@/types"
+import type { JobWithCalculations, Profile } from "@/types"
 import { canUserModifyJob } from "@/lib/authorization/jobPermissions"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { DeleteJobButton } from "./DeleteJobButton"
 
 type JobTableProps = {
-  jobs: Job[],
+  jobs: JobWithCalculations[],
   currentUserProfile: Profile
 }
 
@@ -26,8 +26,9 @@ export default function JobTable({ jobs, currentUserProfile }: JobTableProps) {
             <CardTitle className="flex items-center gap-2">
               {job.job_address}
               {
-                canUserModifyJob(currentUserProfile, job) && (
-                  <DeleteJobButton jobId={job.id} />
+                canUserModifyJob(currentUserProfile, job.salesperson_id) && (
+                  // To-do remove the "!" once view id is set to not null in supabase
+                  <DeleteJobButton jobId={job.id!} />
                 )
               }
             </CardTitle>
@@ -49,7 +50,7 @@ export default function JobTable({ jobs, currentUserProfile }: JobTableProps) {
                 <Link href={`/jobs/${job.id}`}>View</Link>
               </Button>
               {
-                canUserModifyJob(currentUserProfile, job) && (
+                canUserModifyJob(currentUserProfile, job.salesperson_id) && (
                   <Button asChild variant="outline">
                     <Link href={`/jobs/${job.id}/edit`}>Edit</Link>
                   </Button>
