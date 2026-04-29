@@ -16,96 +16,99 @@ export type Database = {
     Tables: {
       divisions: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
+          is_default: boolean
           name: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
+          is_default?: boolean
           name: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
+          is_default?: boolean
           name?: string
         }
         Relationships: []
       }
       jobs: {
         Row: {
-          date_entered: string | null
-          days: number | null
-          disposal: number | null
-          division: string | null
-          entered_by: string | null
-          gutters: number | null
+          date_entered: string
+          days: number
+          disposal: number
+          division_id: string
+          entered_by: string
+          gutters: number
           id: string
           job_address: string
-          labour: number | null
-          materials: number | null
+          labour: number
+          materials: number
           month_quoted: string | null
           month_sold: string | null
-          other: number | null
-          sales_price: number | null
-          salesperson_id: string | null
-          sold: boolean | null
-          squares: number | null
-          type_of_work: string | null
-          updated_at: string | null
-          warranty: number | null
+          other: number
+          sales_price: number
+          salesperson_id: string
+          sold: boolean
+          squares: number
+          updated_at: string
+          warranty: number
+          work_type_id: string
         }
         Insert: {
-          date_entered?: string | null
-          days?: number | null
-          disposal?: number | null
-          division?: string | null
-          entered_by?: string | null
-          gutters?: number | null
+          date_entered?: string
+          days?: number
+          disposal?: number
+          division_id: string
+          entered_by: string
+          gutters?: number
           id?: string
           job_address: string
-          labour?: number | null
-          materials?: number | null
+          labour?: number
+          materials?: number
           month_quoted?: string | null
           month_sold?: string | null
-          other?: number | null
-          sales_price?: number | null
-          salesperson_id?: string | null
-          sold?: boolean | null
-          squares?: number | null
-          type_of_work?: string | null
-          updated_at?: string | null
-          warranty?: number | null
+          other?: number
+          sales_price?: number
+          salesperson_id: string
+          sold?: boolean
+          squares?: number
+          updated_at?: string
+          warranty?: number
+          work_type_id: string
         }
         Update: {
-          date_entered?: string | null
-          days?: number | null
-          disposal?: number | null
-          division?: string | null
-          entered_by?: string | null
-          gutters?: number | null
+          date_entered?: string
+          days?: number
+          disposal?: number
+          division_id?: string
+          entered_by?: string
+          gutters?: number
           id?: string
           job_address?: string
-          labour?: number | null
-          materials?: number | null
+          labour?: number
+          materials?: number
           month_quoted?: string | null
           month_sold?: string | null
-          other?: number | null
-          sales_price?: number | null
-          salesperson_id?: string | null
-          sold?: boolean | null
-          squares?: number | null
-          type_of_work?: string | null
-          updated_at?: string | null
-          warranty?: number | null
+          other?: number
+          sales_price?: number
+          salesperson_id?: string
+          sold?: boolean
+          squares?: number
+          updated_at?: string
+          warranty?: number
+          work_type_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "jobs_division_fkey"
-            columns: ["division"]
+            foreignKeyName: "jobs_division_id_fkey"
+            columns: ["division_id"]
             isOneToOne: false
             referencedRelation: "divisions"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "jobs_entered_by_fkey"
@@ -122,55 +125,58 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "jobs_type_of_work_fkey"
-            columns: ["type_of_work"]
+            foreignKeyName: "jobs_work_type_id_fkey"
+            columns: ["work_type_id"]
             isOneToOne: false
             referencedRelation: "work_types"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
         ]
       }
       profiles: {
         Row: {
-          created_at: string | null
+          created_at: string
+          email: string | null
           full_name: string | null
           id: string
-          is_active: boolean | null
-          role: string | null
+          is_active: boolean
+          role: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
+          email?: string | null
           full_name?: string | null
           id: string
-          is_active?: boolean | null
-          role?: string | null
+          is_active?: boolean
+          role?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
-          is_active?: boolean | null
-          role?: string | null
+          is_active?: boolean
+          role?: string
         }
         Relationships: []
       }
       work_types: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: string
-          is_misc: boolean | null
+          is_default: boolean
           name: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          is_misc?: boolean | null
+          is_default?: boolean
           name: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: string
-          is_misc?: boolean | null
+          is_default?: boolean
           name?: string
         }
         Relationships: []
@@ -182,10 +188,12 @@ export type Database = {
           date_entered: string | null
           days: number | null
           disposal: number | null
-          division: string | null
+          division_id: string | null
+          division_name: string | null
           dollar_per_square: number | null
           ee_mgn_per_day: number | null
           entered_by: string | null
+          entered_by_name: string | null
           gutters: number | null
           id: string | null
           job_address: string | null
@@ -203,17 +211,18 @@ export type Database = {
           squares: number | null
           total_cost_percent: number | null
           total_job_cost: number | null
-          type_of_work: string | null
           updated_at: string | null
           warranty: number | null
+          work_type_id: string | null
+          work_type_name: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "jobs_division_fkey"
-            columns: ["division"]
+            foreignKeyName: "jobs_division_id_fkey"
+            columns: ["division_id"]
             isOneToOne: false
             referencedRelation: "divisions"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "jobs_entered_by_fkey"
@@ -230,18 +239,20 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "jobs_type_of_work_fkey"
-            columns: ["type_of_work"]
+            foreignKeyName: "jobs_work_type_id_fkey"
+            columns: ["work_type_id"]
             isOneToOne: false
             referencedRelation: "work_types"
-            referencedColumns: ["name"]
+            referencedColumns: ["id"]
           },
         ]
       }
     }
     Functions: {
       is_active_user: { Args: never; Returns: boolean }
+      is_manager: { Args: never; Returns: boolean }
       is_manager_or_owner: { Args: never; Returns: boolean }
+      is_owner: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

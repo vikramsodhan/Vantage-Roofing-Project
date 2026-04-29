@@ -88,8 +88,8 @@ export default function JobForm({
   // stores a date (YYYY-MM-01) but the UI shows two separate dropdowns.
 
   const [jobAddress, setJobAddress] = useState(defaultValues?.job_address ?? "")
-  const [division, setDivision] = useState(defaultValues?.division ?? "")
-  const [typeOfWork, setTypeOfWork] = useState(defaultValues?.type_of_work ?? "")
+  const [division, setDivision] = useState(defaultValues?.division_id ?? "")
+  const [workType, setWorkType] = useState(defaultValues?.work_type_id ?? "")
   const [salespersonId, setSalespersonId] = useState(defaultValues?.salesperson_id ?? currentUserProfile.id)
   const [sold, setSold] = useState<boolean>(defaultValues?.sold ?? false)
 
@@ -120,24 +120,22 @@ export default function JobForm({
   }
 
   function buildJobPayload(){
-    const toNumberOrNull = (value: string) =>
-    value !== "" ? parseFloat(value) : null
 
   const toNumberOrZero = (value: string) =>
     value !== "" ? parseFloat(value) : 0
 
   return {
     job_address: jobAddress.trim(),
-    division: division || null,
-    type_of_work: typeOfWork || null,
-    salesperson_id: salespersonId || null,
+    division_id: division,
+    work_type_id: workType,
+    salesperson_id: salespersonId,
     sold,
     month_quoted: toMonthDate(mqMonth, mqYear),
     month_sold: toMonthDate(msMonth, msYear),
 
-    squares: toNumberOrNull(squares),
-    days: toNumberOrNull(days),
-    sales_price: toNumberOrNull(salesPrice),
+    squares: toNumberOrZero(squares),
+    days: toNumberOrZero(days),
+    sales_price: toNumberOrZero(salesPrice),
 
     materials: toNumberOrZero(materials),
     labour: toNumberOrZero(labour),
@@ -145,6 +143,7 @@ export default function JobForm({
     warranty: toNumberOrZero(warranty),
     other: toNumberOrZero(other),
     gutters: toNumberOrZero(gutters),
+    entered_by: currentUserProfile.id
   }}
 
   // ── Submit ───────────────────────────────────────────────────────────────
@@ -208,7 +207,7 @@ export default function JobForm({
         >
           <option value="">— Select division —</option>
           {divisions.map((d) => (
-            <option key={d.id} value={d.name}>{d.name}</option>
+            <option key={d.id} value={d.id}>{d.name}</option>
           ))}
         </select>
       </div>
@@ -217,14 +216,14 @@ export default function JobForm({
       <div>
         <label className="block text-sm font-medium mb-1">Type of Work</label>
         <select
-          value={typeOfWork}
-          onChange={(e) => setTypeOfWork(e.target.value)}
+          value={workType}
+          onChange={(e) => setWorkType(e.target.value)}
           className="w-full border rounded px-3 py-2 text-sm"
           disabled={isPending}
         >
           <option value="">— Select type —</option>
           {workTypes.map((wt) => (
-            <option key={wt.id} value={wt.name}>{wt.name}</option>
+            <option key={wt.id} value={wt.id}>{wt.name}</option>
           ))}
         </select>
       </div>
