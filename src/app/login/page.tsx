@@ -21,21 +21,34 @@
  */
 
 import { useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
- 
+import { Input } from "@/components/ui/input"
+
+
+const IS_DEV_MODE = process.env.NEXT_PUBLIC_DEV_MODE === "true"
+
 export default function LoginPage() {
   const searchParams = useSearchParams()
   const reason = searchParams.get('reason')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
   const supabase = createClient()
+
+  // Google OAuth State
+  const [oAuthloading, setOAuthLoading] = useState(false)
+  const [oAutherror, setOAuthError] = useState<string | null>(null)
+
+  // Dev email/password state (not used in production)
+  const [devEmail, setDevEmail] = useState("")
+  const [devPassword, setDevPassword] = useState("")
+  const [devLoading, setDevLoading] = useState(false)
+  const [devError, setDevError] = useState<string | null>(null)
  
   async function handleGoogleLogin() {
-    setLoading(true)
-    setError(null)
+    setOAuthLoading(true)
+    setOAuthError(null)
  
     const isDev = process.env.NODE_ENV === "development"
  
@@ -52,9 +65,33 @@ export default function LoginPage() {
     const error = test.error
  
     if (error) {
-      setError(error.message)
-      setLoading(false)
+      setOAuthError(error.message)
+      setOAuthLoading(false)
     }
+  }
+
+  async function handleDevLogin() {
+    if (!devEmail.trim() || !devPassword.trim()) {
+      setDevError("Email and password are required.")
+      return
+    }
+
+
+    setDevLoading(true)
+    setDevError(null)
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: devEmail.trim(),
+      password: devPassword.trim(),
+    })
+
+    if (error) {
+      setDevError(error.message)
+      setDevLoading(false)
+      return
+    }
+    
+    router.push("/")
   }
 
   function getReasonMessage() {
@@ -92,12 +129,12 @@ export default function LoginPage() {
             </div>
           )}
 
-          {error && (
-            <p className="text-sm text-red-600 text-center">{error}</p>
+          {oAutherror && (
+            <p className="text-sm text-red-600 text-center">{oAutherror}</p>
           )}
           <Button
             onClick={handleGoogleLogin}
-            disabled={loading}
+            disabled={oAuthloading}
             variant="outline"
             className="w-full"
           >
@@ -107,11 +144,73 @@ export default function LoginPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
-            {loading ? "Redirecting..." : "Sign in with Google"}
+            {oAuthloading ? "Redirecting..." : "Sign in with Google"}
           </Button>
           <p className="text-xs text-center text-muted-foreground">
             Access restricted to @vantageroofingltd.ca accounts
           </p>
+                    {/* Dev-only email/password form — never visible in production */}
+          {
+            IS_DEV_MODE && (
+              <>
+                <div className="relative my-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-white px-2 text-orange-500 font-medium">
+                      Dev only
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                <div className="space-y-1">
+                  <label htmlFor="dev-email" className="text-xs text-muted-foreground">
+                    Email
+                  </label>
+                  <Input
+                    id="dev-email"
+                    type="email"
+                    value={devEmail}
+                    onChange={(e) => setDevEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleDevLogin()}
+                    placeholder="dev@example.com"
+                    disabled={devLoading}
+                    className="h-8 text-sm"
+                  />
+                </div>
+                  <div className="space-y-1">
+                  <label htmlFor="dev-password" className="text-xs text-muted-foreground">
+                    Password
+                  </label>
+                  <Input
+                    id="dev-password"
+                    type="password"
+                    value={devPassword}
+                    onChange={(e) => setDevPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleDevLogin()}
+                    placeholder="••••••••"
+                    disabled={devLoading}
+                    className="h-8 text-sm"
+                  />
+                </div>
+
+                {devError && (
+                  <p className="text-xs text-red-600">{devError}</p>
+                )}
+
+                <Button
+                  onClick={handleDevLogin}
+                  disabled={devLoading}
+                  variant="secondary"
+                  className="w-full h-8 text-sm"
+                >
+                  {devLoading ? "Signing in..." : "Sign in (Dev)"}
+                </Button>
+              </div>
+            </>
+          )}
+
         </CardContent>
       </Card>
     </div>
