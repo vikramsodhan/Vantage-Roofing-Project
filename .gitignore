@@ -41,3 +41,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scripts for data migrations
+scripts/venv
+scripts/project_info
+scripts/data/*.csv        
+scripts/logs/*.csv        
