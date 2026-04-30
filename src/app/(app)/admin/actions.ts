@@ -54,11 +54,11 @@ export async function deleteWorkType(id: string) {
 
   const { data: workType } = await supabase
     .from('work_types')
-    .select('is_misc')
+    .select('is_default')
     .eq('id', id)
     .single()
 
-  if (workType?.is_misc) throw new Error('The Misc work type cannot be deleted.')
+  if (workType?.is_default) throw new Error('The default work type cannot be deleted.')
 
   const { error } = await supabase.from('work_types').delete().eq('id', id)
   if (error) throw new Error('Cannot delete — this work type may be in use by existing jobs.')

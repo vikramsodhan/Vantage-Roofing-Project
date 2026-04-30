@@ -19,8 +19,8 @@ export default async function AdminPage() {
     { data: workTypes },
   ] = await Promise.all([
     supabase.from('profiles').select('*').order('full_name'),
-    supabase.from('divisions').select('*').order('name'),
-    supabase.from('work_types').select('*').order('name'),
+    supabase.from("divisions").select("*").eq("is_default", false).order("name"),
+    supabase.from("work_types").select("*").eq("is_default", false).order("name"),
   ])
 
   return (

@@ -20,8 +20,8 @@ export default async function EditJobPage( {params}: { params: Promise<{ id: str
     { data: salespersons },
   ] = await Promise.all([
     supabase.from("jobs").select("*").eq("id", job_id).single(),
-    supabase.from("divisions").select("id, name").order("name"),
-    supabase.from("work_types").select("id, name").order("name"),
+    supabase.from("divisions").select("id, name").eq("is_default", false).order("name"),
+    supabase.from("work_types").select("id, name").eq("is_default", false).order("name"),
     supabase.from("profiles").select("id, full_name").eq("is_active", true).order("full_name"),
   ])
 

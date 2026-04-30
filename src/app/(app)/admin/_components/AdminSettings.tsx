@@ -23,7 +23,7 @@ export default function AdminSettings({ divisions, workTypes }: AdminSettingsPro
       />
       <ListManager
         title="Work Types"
-        items={workTypes.map(w => ({ id: w.id, name: w.name, protected: w.is_misc ?? false }))}
+        items={workTypes.map(w => ({ id: w.id, name: w.name, protected: w.is_default ?? false }))}
         onAdd={addWorkType}
         onDelete={deleteWorkType}
       />
