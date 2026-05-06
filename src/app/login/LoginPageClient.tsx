@@ -50,14 +50,12 @@ export default function LoginPage() {
     setOAuthLoading(true)
     setOAuthError(null)
  
-    const isDev = process.env.NODE_ENV === "development"
- 
     const test = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
-          ...(isDev ? {} : { hd: "vantageroofingltd.ca" }),
+          ...(IS_DEV_MODE ? {} : { hd: process.env.NEXT_PUBLIC_ALLOWED_DOMAIN }),
         },
       },
     })
@@ -105,7 +103,7 @@ export default function LoginPage() {
       case 'no_user':
         return 'No user email address received. Please try signing in again.'
       case 'unauthorized_domain':
-        return 'Your email domain is not allowed. Please use your @vantageroofingltd.ca account.'
+        return `Your email domain is not allowed. Please use your ${process.env.NEXT_PUBLIC_ALLOWED_DOMAIN} account.`
       case 'profile_creation_failed':
         return 'Failed to create user profile. Please contact your administrator.'
       default:
@@ -147,7 +145,7 @@ export default function LoginPage() {
             {oAuthloading ? "Redirecting..." : "Sign in with Google"}
           </Button>
           <p className="text-xs text-center text-muted-foreground">
-            Access restricted to @vantageroofingltd.ca accounts
+            Access restricted to {process.env.NEXT_PUBLIC_ALLOWED_DOMAIN} accounts
           </p>
                     {/* Dev-only email/password form — never visible in production */}
           {

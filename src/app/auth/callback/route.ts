@@ -31,7 +31,7 @@ import { getProfile } from "@/lib/supabase/getProfile"
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse, type NextRequest } from "next/server"
 
-const ALLOWED_DOMAIN = "vantageroofingltd.ca"
+const ALLOWED_DOMAIN = process.env.NEXT_PUBLIC_ALLOWED_DOMAIN
 const DEV_EMAILS = process.env.NEXT_PUBLIC_DEV_EMAILS?.split(",") ?? []
 
 export async function GET(request: NextRequest) {
